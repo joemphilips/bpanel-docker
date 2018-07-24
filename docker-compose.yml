@@ -1,0 +1,39 @@
+version: '3'
+services:
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    ports:
+      - "80:80" # the http port
+      - "8080:8080" # the web ui
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # so that traefik can listen to docker event
+  bcoin:
+    build:
+      context: ./bcoin
+      args:
+        BCOIN_VERSION: v1.0.2
+    restart: unless-stopped
+    labels:
+      - "traefik.frontend.rule:Host"
+  bpanel:
+    image: bpanel/bpanel
+    restart: unless-stopped
+    environment:
+      # Need this to tell the bpanel client
+      # how to communicate with the bcoin node
+      # in docker
+      BPANEL_NODE_HOST: bcoin
+    ports:
+      - "5000:5000"
+      - "8000:8000"
+    volumes:
+      ## Mapping to local files- Handy for dev
+      - ./webapp:/usr/src/app/webapp
+      - ./server:/usr/src/app/server
+      - ./package.json:/usr/src/app/package.json
+      - ~/.bpanel:/root/.bpanel
+    ## Only MacOSX users need --watch-poll
+    ## the client-id says to use the config created by the
+    ## bcoin docker services
+    command: server --dev --watch-poll --client-id=_docker
