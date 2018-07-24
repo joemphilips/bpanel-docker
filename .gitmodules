@@ -1,0 +1,3 @@
+[submodule "bpanel"]
+	path = bpanel
+	url = https://github.com/joemphilips/bpanel
