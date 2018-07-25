@@ -2,23 +2,58 @@ version: '3'
 services:
   reverse-proxy:
     image: traefik
-    command: --api --docker
+    restart: unless-stopped
+    networks:
+      - traefik_proxy
     ports:
       - "80:80" # the http port
       - "8080:8080" # the web ui
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # so that traefik can listen to docker event
+      - ./config:/var/traefik/
+      - ./cert:/cert
+    command: --api --docker -c /var/traefik/traefik.toml
   bcoin:
     build:
       context: ./bcoin
       args:
         BCOIN_VERSION: v1.0.2
     restart: unless-stopped
+    networks:
+      - apps
+    env_file:
+      - ./etc/regtest.bcoin.env
+    ports:
+      #-- Mainnet
+      - "8333:8333"
+      - "8332:8332" # RPC
+      - "8334:8334" # Wallet
+      #-- Testnet
+      - "18333:18333"
+      - "18332:18332" # RPC
+      - "18334:18334" # Wallet
+      #-- Regtest
+      - "48444:48444"
+      - "48332:48332" # RPC
+      - "48334:48334" # Wallet
+      #-- Simnet
+      - "18555:18555"
+      - "18556:18556" # RPC
+      - "18558:18558" # Wallet
     labels:
-      - "traefik.frontend.rule:Host"
+      - "traefik.enable=true"
+      - "traefik.docker.network=apps"
+      - "traefik.frontend.rule:Host:bcoin.test.bcoinjoemphilips.com"
+      - "traefik.frontend.entryPoints=https"
+      - "traefik.backend=bcoin"
+      - "traefik.port:18332"
+      - "traefik.protocol:http"
   bpanel:
-    image: bpanel/bpanel
+    build:
+      context: ./bpanel
     restart: unless-stopped
+    networks:
+      - apps
     environment:
       # Need this to tell the bpanel client
       # how to communicate with the bcoin node
@@ -28,12 +63,14 @@ services:
       - "5000:5000"
       - "8000:8000"
     volumes:
-      ## Mapping to local files- Handy for dev
-      - ./webapp:/usr/src/app/webapp
-      - ./server:/usr/src/app/server
-      - ./package.json:/usr/src/app/package.json
       - ~/.bpanel:/root/.bpanel
     ## Only MacOSX users need --watch-poll
     ## the client-id says to use the config created by the
     ## bcoin docker services
     command: server --dev --watch-poll --client-id=_docker
+
+networks:
+  traefik_proxy:
+    external: true
+  apps:
+    external: true
