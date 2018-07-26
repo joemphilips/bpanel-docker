@@ -1,2 +1,4 @@
 cert/**
 !cert/.gitkeep
+traefik/*
+!traefik/traefik.toml

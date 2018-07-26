@@ -20,7 +20,11 @@ defaultEntryPoints = ["http", "https"]
 #   entryPoint = "http"
 # [[acme.domains]]
 #  main = "test.bcoinjoemphilips.com"
+[traefikLog]
+  filePath = "/var/traefik/traefik.log"
+[accessLog]
+  filePath = "/var/traefik/access.log"
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "localhost"
+domain = "test.bcoinjoemphilips.com"
 watch = true
