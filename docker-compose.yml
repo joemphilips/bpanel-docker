@@ -7,10 +7,11 @@ services:
       - traefik_proxy
     ports:
       - "80:80" # the http port
+      - "443:443" # the https port
       - "8080:8080" # the web ui
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # so that traefik can listen to docker event
-      - ./config:/var/traefik/
+      - ./traefik:/var/traefik/
       - ./cert:/cert
     command: --api --docker -c /var/traefik/traefik.toml
   bcoin:
@@ -21,8 +22,6 @@ services:
     restart: unless-stopped
     networks:
       - apps
-    env_file:
-      - ./etc/regtest.bcoin.env
     ports:
       #-- Mainnet
       - "8333:8333"
@@ -43,11 +42,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=apps"
-      - "traefik.frontend.rule:Host:bcoin.test.bcoinjoemphilips.com"
+      - "traefik.frontend.rule=Host:bcoin.test.bcoinjoemphilips.com"
       - "traefik.frontend.entryPoints=https"
       - "traefik.backend=bcoin"
       - "traefik.port:18332"
       - "traefik.protocol:http"
+    command: node /code/bcoin/bin/node --prefix=/root/.bcoin
+    volumes:
+      - ~/.bpanel-docker/bcoin:/root/.bcoin
   bpanel:
     build:
       context: ./bpanel
@@ -63,7 +65,7 @@ services:
       - "5000:5000"
       - "8000:8000"
     volumes:
-      - ~/.bpanel:/root/.bpanel
+      - ~/.bpanel-docker/bpanel:/root/.bpanel
     ## Only MacOSX users need --watch-poll
     ## the client-id says to use the config created by the
     ## bcoin docker services
