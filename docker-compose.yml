@@ -43,7 +43,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik_proxy"
-      - "traefik.frontend.rule=Host:test.bcoinjoemphilips.com"
+      - "traefik.frontend.rule=Host:test.bcoinjoemphilips.com;Path:/bcoin;PathPrefixStrip:/bcoin"
       - "traefik.frontend.entryPoints=https"
       - "traefik.backend=bcoin"
       - "traefik.port=18332"
