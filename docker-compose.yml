@@ -43,10 +43,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik_proxy"
-      - "traefik.frontend.rule=Host:test.bcoinjoemphilips.com;Path:/bcoin;PathPrefixStrip:/bcoin"
+      - "traefik.node.frontend.rule=Host:test.bcoinjoemphilips.com;PathPrefix:/bcoin;PathPrefixStrip:/bcoin"
+      - "traefik.wallet.frontend.rule=Host:test.bcoinjoemphilips.com;PathPrefix:/bcoin/wallet;PathPrefixStrip:/bcoin"
       - "traefik.frontend.entryPoints=https"
       - "traefik.backend=bcoin"
-      - "traefik.port=18332"
+      - "traefik.node.port=18332"
+      - "traefik.wallet.port=18334"
       - "traefik.protocol=http"
     command: node /code/bcoin/bin/node --prefix=/root/.bcoin
     volumes:
