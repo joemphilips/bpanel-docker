@@ -1,4 +1,4 @@
-logLevel = "INFO"
+logLevel = "DEBUG"
 defaultEntryPoints = ["http", "https"]
 
 [entryPoints]
@@ -25,6 +25,8 @@ defaultEntryPoints = ["http", "https"]
 [accessLog]
   filePath = "/var/traefik/access.log"
 [docker]
-endpoint = "unix:///var/run/docker.sock"
+# endpoint = "unix:///var/run/docker.sock"
 domain = "test.bcoinjoemphilips.com"
 watch = true
+#swarmmode = true
+# [backend]

@@ -22,6 +22,7 @@ services:
     restart: unless-stopped
     networks:
       - apps
+      - traefik_proxy
     ports:
       #-- Mainnet
       - "8333:8333"
@@ -41,12 +42,12 @@ services:
       - "18558:18558" # Wallet
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=apps"
-      - "traefik.frontend.rule=Host:bcoin.test.bcoinjoemphilips.com"
+      - "traefik.docker.network=traefik_proxy"
+      - "traefik.frontend.rule=Host:test.bcoinjoemphilips.com"
       - "traefik.frontend.entryPoints=https"
       - "traefik.backend=bcoin"
-      - "traefik.port:18332"
-      - "traefik.protocol:http"
+      - "traefik.port=18332"
+      - "traefik.protocol=http"
     command: node /code/bcoin/bin/node --prefix=/root/.bcoin
     volumes:
       - ~/.bpanel-docker/bcoin:/root/.bcoin
