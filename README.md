@@ -1,6 +1,6 @@
 # bpanel-docker
 
-running bpanel and bcoin with nginx and docker-compose
+running bpanel and bcoin with traefik and docker-compose
 
 ## how to
 
